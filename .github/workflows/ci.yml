@@ -29,15 +29,17 @@ jobs:
       - name: Reporte cobertura
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
-          filename: ./coverage/cobertura-coverage.xml
+          filename: coverage.cobertura.xml
           badge: true
           format: 'markdown'
           output: 'both'
 
-      - name: Añadir cobertura a PR
+      - name: Añadir resultado de cobertura a la PR
         uses: marocchino/sticky-pull-request-comment@v2
         if: github.event_name == 'pull_request'
         with:
           recreate: true
-          path: code-coverage-results.md
+          path: resultado-cobertura.md
 
+      - name: Muestra el resultado de cobertura en el build summary
+        run: cat resultado-cobertura.md >> $GITHUB_STEP_SUMMARY
