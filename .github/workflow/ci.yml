@@ -9,24 +9,37 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
       - name: Configurar Node.js y Yarn
         uses: actions/setup-node@v2
         with:
           node-version: '14.x'
           cache: 'yarn'
+
       - name: Instalar dependencias
         run: yarn install
+
       - name: Compilar TypeScript
         run: yarn build
-      - name: Ejecutar pruebas
-        run: yarn test
-        
-      - name: Generate Code Coverage report
-        id: code-coverage
-        uses: barecheck/code-coverage-action@v1
+
+      - name: Ejecutar pruebas y generar reporte de cobertura
+        run: |
+          yarn test --coverage --coverageReporters=cobertura
+
+      - name: Reporte cobertura
+        uses: irongut/CodeCoverageSummary@v1.3.0
         with:
-          barecheck-github-app-token: ${{ secrets.BARECHECK_GITHUB_APP_TOKEN }}
-          lcov-file: "./coverage/lcov.info"
-          base-lcov-file: "./coverage/base-lcov.info"
-          send-summary-comment: true
-          show-annotations: "warning"
+          filename: coverage.cobertura.xml
+          badge: true
+          format: 'markdown'
+          output: 'both'
+
+      - name: Añadir resultado de cobertura a la PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: github.event_name == 'pull_request'
+        with:
+          recreate: true
+          path: resultado-cobertura.md
+
+      - name: Muestra el resultado de cobertura en el build summary
+        run: cat resultado-cobertura.md >> $GITHUB_STEP_SUMMARY
