@@ -9,19 +9,37 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
       - name: Configurar Node.js y Yarn
         uses: actions/setup-node@v2
         with:
           node-version: '18.x'
           cache: 'yarn'
+
       - name: Instalar dependencias
         run: yarn install
+
       - name: Compilar TypeScript
         run: yarn build
+
       - name: Ejecutar pruebas y generar reporte de cobertura
         run: |
           yarn test --coverage --coverageReporters=cobertura
-      - name: Code Coverage Summary Report
+
+      - name: Reporte cobertura
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
-          filename: ./coverage/cobertura-coverage.xml
+          filename: coverage.cobertura.xml
+          badge: true
+          format: 'markdown'
+          output: 'both'
+
+      - name: Añadir resultado de cobertura a la PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: github.event_name == 'pull_request'
+        with:
+          recreate: true
+          path: resultado-cobertura.md
+
+      - name: Muestra el resultado de cobertura en el build summary
+        run: cat resultado-cobertura.md >> $GITHUB_STEP_SUMMARY
