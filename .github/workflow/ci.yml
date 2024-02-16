@@ -18,9 +18,10 @@ jobs:
         run: yarn install
       - name: Compilar TypeScript
         run: yarn build
-      - name: Ejecutar pruebas
-        run: yarn test
+      - name: Ejecutar pruebas y generar reporte de cobertura
+        run: |
+          yarn test --coverage --coverageReporters=cobertura
       - name: Code Coverage Summary Report
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
-          filename: ./coverage.cobertura.xml
+          filename: ./coverage/cobertura-coverage.xml
