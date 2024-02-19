@@ -2,6 +2,9 @@ name: Ejecutar pruebas
 
 on: [push, pull_request]
 
+permissions:
+  pull-requests: write
+  
 jobs:
   build:
 
